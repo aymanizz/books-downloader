@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
-{% for d in data %}
-<p>{{ d }}</p>
+<p>results found: {{ results }}</p>
+{% for book in books %}
+<p>{{ book }}</p>
+{% endfor %}
+{% for page in range(1, pages + 1) %}
+<a href="{{ url_for('search', title=title, page=page) }}">{{ page }}</a>
 {% endfor %}
 {% endblock %}

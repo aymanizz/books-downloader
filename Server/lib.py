@@ -36,7 +36,7 @@ def get_response(endpoint, **params):
     request  = urllib.request.Request(url)
     return urllib.request.urlopen(request).read().decode('utf-8')
 
-def get_books_ids(title, results=50):
+def get_books_ids(title, page, results=50):
     params = {
         # the search query
         'req'   : title,
@@ -48,12 +48,20 @@ def get_books_ids(title, results=50):
         'phrase': 1,
         # search in the default column field, other possible values
         # include title, isbn, md5, ...
-        'column': 'def'
+        'column': 'def',
+        # load results from page `page`
+        'page'  : page
     }
 
     response = get_response(ENDPOINTS['search'], **params)
     ids = re.findall('<tr.*?><td>(\d+)', response)
-    return ids
+    num = re.search('(\d+) books found', response)
+    if num is not None:
+    	num = int(num.groups()[0])
+    else:
+    	print("ERROR!!!!")
+    	num = 0
+    return ids, num
 
 def get_books_meta_by_ids(ids, fields=None, load=True):
     if fields is None:
@@ -67,8 +75,8 @@ def get_download_key(md5):
     res = get_response(ENDPOINTS['download'], md5=md5)
     return re.findall('&key=([^\'"]*)', res)[0]
 
-def get_books_meta(title):
-  ids = get_books_ids(title)
+def get_books_meta(title, page):
+  ids, num = get_books_ids(title, page)
   if ids == []:
     return []
   books = get_books_meta_by_ids(ids)
@@ -77,7 +85,7 @@ def get_books_meta(title):
   for book in books:
     book['filesize'] = format_size(int(book['filesize']))
   
-  return books
+  return books, num
 
 def get_book_url(md5):
   key = get_download_key(md5)

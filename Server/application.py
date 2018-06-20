@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+
+from math import ceil
+
 from flask import Flask, request, render_template, redirect, url_for
 from lib import get_books_meta, get_book_url
 
@@ -16,17 +20,21 @@ def index():
 @app.route('/search')
 def search():
   title = request.args.get('title')
+  page = request.args.get('page', 1)
+  try:
+  	page = int(page)
+  except ValueError:
+  	page = 1
   if title is None or title == '': # handle  titles with less than 3 characters
     return redirect(url_for('/'))
 
   try:
-    data = get_books_meta(title)
-    print(data)
+    books, num = get_books_meta(title, page)
   except Exception as err:
     if app.debug:
       raise
     return render_template('error.html', err=err if app.debug else None)
-  return render_template('search.html', data=data)
+  return render_template('search.html', title=title, books=books, pages=ceil(num / 50), results=num)
 
 @app.route('/get')
 def get_book():
