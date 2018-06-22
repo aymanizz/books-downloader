@@ -51,4 +51,4 @@ def get_book():
   return redirect(get_book_url(md5))
 
 if __name__ == '__main__':
-  app.run(debug=False)
+  app.run()
