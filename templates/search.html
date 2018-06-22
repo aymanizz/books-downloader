@@ -1,8 +1,16 @@
 {% extends "layout.html" %}
 {% block body %}
 <p>results found: {{ results }}</p>
+<br>
 {% for book in books %}
-<p>{{ book }}</p>
+<p><b>{{ book['title'] }}</b></p>
+<p> 
+		 size: {{ book['filesize'] }}
+	<br> author: {{ book['author'] }}
+	<br> pages: {{ book['pages'] }}
+	<br> extension: {{ book['extension'] }}
+	<br> download: <a href="{{ url_for('get_book', md5=book['md5']) }}">direct</a>
+</p>
 {% endfor %}
 {% for page in range(1, pages + 1) %}
 <a href="{{ url_for('search', title=title, page=page) }}">{{ page }}</a>

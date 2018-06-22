@@ -3,6 +3,9 @@ import json
 import urllib.request
 import urllib.parse
 
+# TODO: compile regular expressions ahead of search for faster results
+# FUTURE: use `result = re.findall(r'topicid(\d+).*?>([\w\-\:\.\, ]+)?<', a)` to get topics and their ids
+
 ENDPOINTS = {
     'search'   : 'http://libgen.io/search.php',
     'api'      : 'http://libgen.io/json.php',
@@ -10,7 +13,9 @@ ENDPOINTS = {
     'direct_download': 'http://dl3.libgen.io/get.php'
 }
 
-FIELDS = ['title', 'filesize', 'md5']
+FIELDS = [
+  'title', 'filesize', 'author', 'pages', 'publisher', 'extension', 'md5'
+]
 
 def format_size(size):
     KB = 1024

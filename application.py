@@ -13,6 +13,9 @@ app.config.update(dict(
   SECRET_KEY='development secret'
 ))
 
+def error(msg):
+  return render_template('error.html', err=msg)
+
 @app.route('/')
 def index():
   return render_template('index.html')
@@ -26,14 +29,18 @@ def search():
   except ValueError:
   	page = 1
   if title is None or title == '': # handle  titles with less than 3 characters
-    return redirect(url_for('/'))
+    return error('No title specified.')
 
   try:
     books, num = get_books_meta(title, page)
+    pages = ceil(num / 50)
+    # check for sane results
+    if page > pages:
+      return error('Requested page is out of range.')
   except Exception as err:
     if app.debug:
       raise
-    return render_template('error.html', err=err if app.debug else None)
+    return error(err)
   return render_template('search.html', title=title, books=books, pages=ceil(num / 50), results=num)
 
 @app.route('/get')
@@ -44,4 +51,4 @@ def get_book():
   return redirect(get_book_url(md5))
 
 if __name__ == '__main__':
-  app.run()
+  app.run(debug=False)
