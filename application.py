@@ -25,23 +25,28 @@ def search():
   title = request.args.get('title')
   page = request.args.get('page', 1)
   try:
-  	page = int(page)
+    page = int(page)
   except ValueError:
-  	page = 1
-  if title is None or title == '': # handle  titles with less than 3 characters
+    # fallback to 1
+    # TODO return an error
+    page = 1
+  # handle  titles with less than 3 characters
+  if title is None or title == '':
     return error('No title specified.')
-
   try:
     books, num = get_books_meta(title, page)
     pages = ceil(num / 50)
-    # check for sane results
+    # check for sane results...
+    # libgen will return a list of books even
+    # if the page requested is out of pages range
     if page > pages:
       return error('Requested page is out of range.')
   except Exception as err:
     if app.debug:
       raise
     return error(err)
-  return render_template('search.html', title=title, books=books, pages=ceil(num / 50), results=num)
+  return render_template(
+    'search.html', title=title, books=books, pages=pages, results=num)
 
 @app.route('/get')
 def get_book():

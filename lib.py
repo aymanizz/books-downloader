@@ -4,12 +4,13 @@ import urllib.request
 import urllib.parse
 
 # TODO: compile regular expressions ahead of search for faster results
-# FUTURE: use `result = re.findall(r'topicid(\d+).*?>([\w\-\:\.\, ]+)?<', a)` to get topics and their ids
+# FUTURE: use `result = re.findall(r'topicid(\d+).*?>([\w\-\:\.\, ]+)?<', a)`
+#       to get topics and their ids
 
 ENDPOINTS = {
-    'search'   : 'http://libgen.io/search.php',
-    'api'      : 'http://libgen.io/json.php',
-    'download' : 'http://download1.libgen.io/ads.php',
+    'search'         : 'http://libgen.io/search.php',
+    'api'            : 'http://libgen.io/json.php',
+    'download'       : 'http://download1.libgen.io/ads.php',
     'direct_download': 'http://dl3.libgen.io/get.php'
 }
 
@@ -59,12 +60,14 @@ def get_books_ids(title, page, results=50):
     }
 
     response = get_response(ENDPOINTS['search'], **params)
-    ids = re.findall('<tr.*?><td>(\d+)', response)
-    num = re.search('(\d+) books found', response)
+    ids = re.findall(r'<tr.*?><td>(\d+)', response)
+    num = re.search(r'(\d+) books found', response)
     if num is not None:
     	num = int(num.groups()[0])
     else:
-    	print("ERROR!!!!")
+        # TODO this is actually an error and should be handled
+        # differently, possibly raising an error, or return an
+        # error code.
     	num = 0
     return ids, num
 
@@ -85,7 +88,6 @@ def get_books_meta(title, page):
   if ids == []:
     return []
   books = get_books_meta_by_ids(ids)
-  num_of_books = len(ids)
   
   for book in books:
     book['filesize'] = format_size(int(book['filesize']))
